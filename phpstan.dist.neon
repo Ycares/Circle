@@ -1,3 +1,7 @@
+includes:
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-doctrine/rules.neon
+
 parameters:
     level: 6
     paths:
@@ -6,3 +10,6 @@ parameters:
     excludePaths:
         - src/Kernel.php
         - tests/bootstrap.php
+        - tests/phpstan/object-manager.php
+    doctrine:
+        objectManagerLoader: tests/phpstan/object-manager.php

@@ -18,3 +18,7 @@
 /Marque-Page_CLAUDE.md
 /.claude/
 ###< confidentialité IA ###
+
+###> phpactor/phpactor ###
+/.phpactor.json
+###< phpactor/phpactor ###
