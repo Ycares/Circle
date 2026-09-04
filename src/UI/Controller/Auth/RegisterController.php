@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\UI\Controller\Auth;
 
-use App\Application\UseCase\RegisterUser\RegisterUserDTO;
 use App\Application\UseCase\RegisterUser\RegisterUserUseCase;
 use App\Domain\Exception\EmailAlreadyRegisteredException;
 use App\Domain\Exception\InvalidEmailAddressException;
@@ -36,12 +35,12 @@ final class RegisterController extends AbstractController
                 $errors[] = 'Jeton de sécurité invalide, merci de réessayer.';
             } else {
                 try {
-                    $this->registerUserUseCase->execute(new RegisterUserDTO(
-                        email: $email,
-                        plainPassword: (string) $request->request->get('password', ''),
-                        pseudo: $pseudo,
-                        preferredLanguage: $preferredLanguage,
-                    ));
+                    $this->registerUserUseCase->execute(
+                        $email,
+                        (string) $request->request->get('password', ''),
+                        $pseudo,
+                        $preferredLanguage,
+                    );
 
                     $this->addFlash('success', 'Votre compte a été créé, vous pouvez maintenant vous connecter.');
 

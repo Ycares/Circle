@@ -18,19 +18,19 @@ final class RegisterUserUseCase
     ) {
     }
 
-    public function execute(RegisterUserDTO $dto): void
+    public function execute(string $email, string $plainPassword, string $pseudo, string $preferredLanguage): void
     {
-        $email = new EmailAddress($dto->email);
+        $emailAddress = new EmailAddress($email);
 
-        if (null !== $this->userRepository->ofEmail($email)) {
-            throw new EmailAlreadyRegisteredException($email);
+        if (null !== $this->userRepository->ofEmail($emailAddress)) {
+            throw new EmailAlreadyRegisteredException($emailAddress);
         }
 
         $user = new User(
-            $email,
-            $this->passwordHasher->hash($dto->plainPassword),
-            $dto->pseudo,
-            $dto->preferredLanguage,
+            $emailAddress,
+            $this->passwordHasher->hash($plainPassword),
+            $pseudo,
+            $preferredLanguage,
             new \DateTimeImmutable(),
         );
 
