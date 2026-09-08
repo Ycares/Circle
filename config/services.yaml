@@ -22,4 +22,11 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     App\Domain\Repository\UserRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\UserDoctrineRepository'
+    App\Domain\Repository\BookRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\BookDoctrineRepository'
+    App\Domain\Repository\UserBookRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\UserBookDoctrineRepository'
+    App\Domain\Repository\ReadingClubRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\ReadingClubDoctrineRepository'
+    App\Domain\Repository\ChapterRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\ChapterDoctrineRepository'
+    App\Domain\Repository\ClubMembershipRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\ClubMembershipDoctrineRepository'
+    App\Domain\Repository\DiscussionRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\DiscussionDoctrineRepository'
+    App\Domain\Repository\ReportRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\ReportDoctrineRepository'
     App\Application\Port\PasswordHasherInterface: '@App\Infrastructure\Security\SymfonyPasswordHasher'
