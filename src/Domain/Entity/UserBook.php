@@ -19,6 +19,7 @@ final class UserBook
         private \DateTimeImmutable $createdAt,
         private \DateTimeImmutable $updatedAt,
     ) {
+        self::assertValidProgress($progress);
     }
 
     public function id(): ?int
@@ -65,8 +66,17 @@ final class UserBook
 
     public function updateProgress(int $progress): void
     {
+        self::assertValidProgress($progress);
+
         $this->progress = $progress;
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    private static function assertValidProgress(int $progress): void
+    {
+        if ($progress < 0 || $progress > 100) {
+            throw new \InvalidArgumentException('Le pourcentage de progression doit être compris entre 0 et 100.');
+        }
     }
 
     public function createdAt(): \DateTimeImmutable
