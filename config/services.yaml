@@ -29,4 +29,5 @@ services:
     App\Domain\Repository\ClubMembershipRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\ClubMembershipDoctrineRepository'
     App\Domain\Repository\DiscussionRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\DiscussionDoctrineRepository'
     App\Domain\Repository\ReportRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\ReportDoctrineRepository'
+    App\Domain\Repository\ReviewRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\ReviewDoctrineRepository'
     App\Application\Port\PasswordHasherInterface: '@App\Infrastructure\Security\SymfonyPasswordHasher'
