@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                   https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Domain\Entity\ClubMembership" table="club_memberships">
+        <unique-constraints>
+            <unique-constraint columns="user_id,reading_club_id" name="uniq_user_club"/>
+        </unique-constraints>
+
+        <id name="id" type="integer">
+            <generator strategy="IDENTITY"/>
+        </id>
+
+        <many-to-one field="user" target-entity="App\Domain\Entity\User">
+            <join-column name="user_id" referenced-column-name="id" nullable="false"/>
+        </many-to-one>
+
+        <many-to-one field="readingClub" target-entity="App\Domain\Entity\ReadingClub">
+            <join-column name="reading_club_id" referenced-column-name="id" nullable="false"/>
+        </many-to-one>
+
+        <field name="declaredChapter" type="integer" column="declared_chapter" nullable="false"/>
+        <field name="role" type="string" column="role" length="20" nullable="false"
+               enum-type="App\Domain\ValueObject\ClubRole"/>
+        <field name="joinedAt" type="datetime_immutable" column="joined_at" nullable="false"/>
+    </entity>
+</doctrine-mapping>

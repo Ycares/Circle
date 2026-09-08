@@ -13,13 +13,3 @@ parameters:
         - tests/phpstan/object-manager.php
     doctrine:
         objectManagerLoader: tests/phpstan/object-manager.php
-    # Les entités du Domain pas encore mappées par Doctrine (à venir à l'ÉTAPE 2) ont un $id
-    # jamais assigné du point de vue statique : phpstan-doctrine ne peut lever ce faux positif
-    # qu'une fois le mapping XML de l'entité en place, comme c'est déjà le cas pour User.
-    # Cette règle doit être retirée entité par entité au fur et à mesure du mapping (l'ÉTAPE 2 échouera
-    # à la compter comme obsolète si plus aucune entité concernée ne matche).
-    ignoreErrors:
-        -
-            message: '#^Property App\\Domain\\Entity\\\w+::\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
-            path: src/Domain/Entity/*.php
-            count: 8

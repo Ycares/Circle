@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                   https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Domain\Entity\Report" table="reports">
+        <id name="id" type="integer">
+            <generator strategy="IDENTITY"/>
+        </id>
+
+        <field name="reportedContentType" type="string" column="reported_content_type" length="20" nullable="false"/>
+        <field name="reportedContentId" type="integer" column="reported_content_id" nullable="false"/>
+
+        <many-to-one field="reporter" target-entity="App\Domain\Entity\User">
+            <join-column name="reporter_id" referenced-column-name="id" nullable="false"/>
+        </many-to-one>
+
+        <field name="reason" type="text" column="reason" nullable="false"/>
+        <field name="status" type="string" column="status" length="20" nullable="false"
+               enum-type="App\Domain\ValueObject\ReportStatus"/>
+        <field name="createdAt" type="datetime_immutable" column="created_at" nullable="false"/>
+    </entity>
+</doctrine-mapping>
