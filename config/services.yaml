@@ -36,3 +36,14 @@ services:
     App\Infrastructure\BookMetadata\GoogleBooksProvider:
         arguments:
             $apiKey: '%env(GOOGLE_BOOKS_API_KEY)%'
+
+# En environnement de test, ce service doit rester public et non « inliné » par le
+# compilateur, afin qu'un test fonctionnel puisse le remplacer via
+# self::getContainer()->set(GoogleBooksProvider::class, ...).
+when@test:
+    services:
+        App\Infrastructure\BookMetadata\GoogleBooksProvider:
+            autowire: true
+            public: true
+            arguments:
+                $apiKey: '%env(GOOGLE_BOOKS_API_KEY)%'
