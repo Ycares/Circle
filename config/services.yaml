@@ -31,3 +31,8 @@ services:
     App\Domain\Repository\ReportRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\ReportDoctrineRepository'
     App\Domain\Repository\ReviewRepositoryInterface: '@App\Infrastructure\Persistence\Doctrine\Repository\ReviewDoctrineRepository'
     App\Application\Port\PasswordHasherInterface: '@App\Infrastructure\Security\SymfonyPasswordHasher'
+    App\Application\Port\BookMetadataProviderInterface: '@App\Infrastructure\BookMetadata\GoogleBooksProvider'
+
+    App\Infrastructure\BookMetadata\GoogleBooksProvider:
+        arguments:
+            $apiKey: '%env(GOOGLE_BOOKS_API_KEY)%'
