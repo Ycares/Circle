@@ -8,6 +8,7 @@
                     <strong>{{ discussion.author.pseudo }}</strong>
                     <time>{{ discussion.createdAt|date('d/m/Y H:i') }}</time>
                     <p>{{ discussion.text }}</p>
+                    {% include 'report/_report_modal.html.twig' with {contentType: 'discussion', contentId: discussion.id} %}
                 </li>
             {% else %}
                 <li>Aucun message pour le moment.</li>

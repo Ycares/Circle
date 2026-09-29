@@ -10,11 +10,14 @@
         </id>
 
         <field name="title" type="string" column="title" length="255" nullable="false"/>
-        <field name="authors" type="simple_array" column="authors" nullable="false"/>
+        <!-- nullable en base : SimpleArrayType convertit un tableau PHP vide en NULL (jamais en
+             chaîne vide), un tableau non nullable en NOT NULL ferait donc échouer l'insertion
+             dès qu'un livre Google Books n'a pas d'auteur ou de genre renseigné -->
+        <field name="authors" type="simple_array" column="authors" nullable="true"/>
         <field name="language" type="string" column="language" length="10" nullable="false"/>
         <field name="coverUrl" type="string" column="cover_url" length="500" nullable="true"/>
         <field name="externalId" type="string" column="external_id" length="255" nullable="false" unique="true"/>
-        <field name="genres" type="simple_array" column="genres" nullable="false"/>
+        <field name="genres" type="simple_array" column="genres" nullable="true"/>
         <field name="createdAt" type="datetime_immutable" column="created_at" nullable="false"/>
     </entity>
 </doctrine-mapping>

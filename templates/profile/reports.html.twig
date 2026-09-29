@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Signalements{% endblock %}
+
+{% block body %}
+    <h1>Signalements de mes clubs</h1>
+
+    {% if items is empty %}
+        <p>Aucun signalement pour le moment.</p>
+    {% else %}
+        <ul class="report-list">
+            {% for item in items %}
+                <li>
+                    <p>Club : {{ item.discussion.readingClub.name }}</p>
+                    <p>Signalé par : {{ item.report.reporter.pseudo }}</p>
+                    <p>Raison : {{ item.report.reason }}</p>
+                    <p>Message signalé : {{ item.discussion.text }}</p>
+                    <time>{{ item.report.createdAt|date('d/m/Y H:i') }}</time>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p><a href="{{ path('app_profile') }}">Retour au profil</a></p>
+{% endblock %}
