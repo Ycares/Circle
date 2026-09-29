@@ -10,6 +10,7 @@ use App\Application\UseCase\UpdateReadingProgress\UpdateReadingProgressUseCase;
 use App\Domain\Exception\BookAlreadyInLibraryException;
 use App\Domain\Exception\EntityNotFoundException;
 use App\Domain\Exception\UnauthorizedActionException;
+use App\Domain\Repository\ReviewRepositoryInterface;
 use App\Domain\Repository\UserBookRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,7 @@ final class LibraryController extends AbstractController
 
     public function __construct(
         private readonly UserBookRepositoryInterface $userBookRepository,
+        private readonly ReviewRepositoryInterface $reviewRepository,
         private readonly BookMetadataProviderInterface $bookMetadataProvider,
         private readonly AddBookToLibraryUseCase $addBookToLibraryUseCase,
         private readonly UpdateReadingProgressUseCase $updateReadingProgressUseCase,
@@ -36,8 +38,15 @@ final class LibraryController extends AbstractController
     {
         $userBooks = $this->userBookRepository->ofUser($this->currentUser());
 
+        $reviewsByUserBookId = [];
+        foreach ($userBooks as $userBook) {
+            \assert(null !== $userBook->id());
+            $reviewsByUserBookId[$userBook->id()] = $this->reviewRepository->ofUserBook($userBook);
+        }
+
         return $this->render('library/index.html.twig', [
             'userBooks' => $userBooks,
+            'reviewsByUserBookId' => $reviewsByUserBookId,
         ]);
     }
 

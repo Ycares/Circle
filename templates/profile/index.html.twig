@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+    <h1>Mon profil</h1>
+
+    <p>Pseudo : {{ user.pseudo }}</p>
+    <p>Email : {{ user.email.value }}</p>
+
+    <section>
+        <h2>Statistiques</h2>
+        <ul>
+            <li>Livres lus : {{ booksRead }}</li>
+            <li>Clubs rejoints : {{ clubsJoined }}</li>
+        </ul>
+    </section>
+
+    <p><a href="{{ path('app_profile_reports') }}">Signalements de mes clubs</a></p>
+{% endblock %}

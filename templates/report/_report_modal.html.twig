@@ -1,0 +1,19 @@
+{# Formulaire de signalement réutilisable pour une discussion ou un avis.
+   Variables attendues : contentType ('discussion' ou 'review'), contentId #}
+<dialog id="report-{{ contentType }}-{{ contentId }}">
+    <form method="post" action="{{ path('app_report_content') }}">
+        <p>Pourquoi signalez-vous ce contenu ?</p>
+        <textarea name="reason" required></textarea>
+
+        <input type="hidden" name="contentType" value="{{ contentType }}">
+        <input type="hidden" name="contentId" value="{{ contentId }}">
+        <input type="hidden" name="redirectTo" value="{{ app.request.pathinfo }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('report_content') }}">
+
+        <button type="submit">Envoyer le signalement</button>
+        <button type="button" onclick="this.closest('dialog').close()">Annuler</button>
+    </form>
+</dialog>
+<button type="button" onclick="document.getElementById('report-{{ contentType }}-{{ contentId }}').showModal()">
+    Signaler
+</button>

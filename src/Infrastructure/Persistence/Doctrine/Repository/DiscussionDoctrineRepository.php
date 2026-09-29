@@ -21,6 +21,11 @@ final class DiscussionDoctrineRepository implements DiscussionRepositoryInterfac
         $this->entityManager->flush();
     }
 
+    public function ofId(int $id): ?Discussion
+    {
+        return $this->entityManager->find(Discussion::class, $id);
+    }
+
     public function ofReadingClub(ReadingClub $readingClub): array
     {
         return $this->entityManager->getRepository(Discussion::class)->findBy(['readingClub' => $readingClub]);

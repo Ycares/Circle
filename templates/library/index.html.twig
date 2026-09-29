@@ -72,6 +72,37 @@
                                 <input type="hidden" name="_token" value="{{ csrf_token('library_update_progress') }}">
                                 <button type="submit">Mettre à jour</button>
                             </form>
+
+                            <div class="reviews">
+                                <h4>Avis</h4>
+                                <ul>
+                                    {% for review in reviewsByUserBookId[userBook.id] %}
+                                        <li class="review">
+                                            {% if review.containsSpoiler %}
+                                                <button type="button" onclick="this.nextElementSibling.hidden = false; this.hidden = true;">
+                                                    Révéler (contient un spoiler)
+                                                </button>
+                                                <p hidden>{{ review.text }}</p>
+                                            {% else %}
+                                                <p>{{ review.text }}</p>
+                                            {% endif %}
+                                            {% include 'report/_report_modal.html.twig' with {contentType: 'review', contentId: review.id} %}
+                                        </li>
+                                    {% else %}
+                                        <li>Aucun avis pour le moment.</li>
+                                    {% endfor %}
+                                </ul>
+
+                                <form method="post" action="{{ path('app_library_review', {id: userBook.id}) }}">
+                                    <textarea name="text" required placeholder="Votre avis..."></textarea>
+                                    <label>
+                                        <input type="checkbox" name="containsSpoiler" value="1">
+                                        Contient un spoiler
+                                    </label>
+                                    <input type="hidden" name="_token" value="{{ csrf_token('library_review') }}">
+                                    <button type="submit">Publier l'avis</button>
+                                </form>
+                            </div>
                         </div>
                     </li>
                 {% endfor %}

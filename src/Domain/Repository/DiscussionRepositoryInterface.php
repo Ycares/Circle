@@ -11,6 +11,8 @@ interface DiscussionRepositoryInterface
 {
     public function save(Discussion $discussion): void;
 
+    public function ofId(int $id): ?Discussion;
+
     /**
      * @return list<Discussion>
      */
