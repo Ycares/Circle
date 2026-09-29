@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ club.name }}{% endblock %}
+
+{% block body %}
+    <h1>{{ club.name }}</h1>
+    <p>{{ club.description }}</p>
+    <p>Hôte : {{ club.host.pseudo }}</p>
+
+    {% for message in app.flashes('success') %}
+        <p class="flash-success">{{ message }}</p>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <p class="flash-error">{{ message }}</p>
+    {% endfor %}
+
+    {% if club.currentBook %}
+        <section>
+            <h2>Livre en cours</h2>
+            <p>{{ club.currentBook.title }} — {{ club.currentBook.authors|join(', ') }}</p>
+            <p>{{ club.chapterCount }} chapitres</p>
+        </section>
+    {% else %}
+        <p>Aucun livre en cours pour le moment.</p>
+    {% endif %}
+
+    {% if isHost %}
+        <section>
+            <h2>Gérer le livre en cours</h2>
+            {% include 'club/_set_book.html.twig' %}
+        </section>
+    {% endif %}
+
+    {% if membership is null %}
+        {% if club.visibility.value == 'public' %}
+            <form method="post" action="{{ path('app_club_join', {id: club.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('club_join') }}">
+                <button type="submit">Rejoindre le club</button>
+            </form>
+        {% else %}
+            <p>Ce club est privé : une invitation ou une demande d'adhésion est nécessaire.</p>
+        {% endif %}
+    {% else %}
+        {% if club.chapterCount %}
+            <section data-controller="chapter-progress">
+                <label for="declared-chapter">Chapitre atteint</label>
+                <select
+                    id="declared-chapter"
+                    data-chapter-progress-target="select"
+                    data-action="change->chapter-progress#update"
+                    data-chapter-progress-url-value="{{ path('app_club_declare_progress', {id: club.id}) }}"
+                    data-chapter-progress-token-value="{{ csrf_token('club_declare_progress') }}"
+                >
+                    <option value="0" {{ membership.declaredChapter == 0 ? 'selected' : '' }}>Pas encore commencé</option>
+                    {% for chapter in chapters %}
+                        <option value="{{ chapter.chapterNumber }}" {{ membership.declaredChapter == chapter.chapterNumber ? 'selected' : '' }}>
+                            Chapitre {{ chapter.chapterNumber }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </section>
+        {% endif %}
+
+        <section>
+            <h2>Membres</h2>
+            <ul>
+                {% for member in members %}
+                    <li>{{ member.user.pseudo }} ({{ member.role.value }})</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section>
+            <h2>Discussions</h2>
+            {% include 'club/_chapters.html.twig' %}
+            <turbo-frame id="discussions" src="{{ path('app_club_discussions', {id: club.id}) }}"></turbo-frame>
+        </section>
+    {% endif %}
+{% endblock %}

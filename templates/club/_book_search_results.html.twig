@@ -1,0 +1,41 @@
+<turbo-frame id="club-book-search-results">
+    {% if query is not empty and results is empty %}
+        <p>Aucun résultat pour « {{ query }} ».</p>
+    {% endif %}
+
+    {% if results is not empty %}
+        <ul class="search-results">
+            {% for result in results %}
+                <li class="search-result">
+                    {% if result.coverUrl %}
+                        <img src="{{ result.coverUrl }}" alt="">
+                    {% endif %}
+
+                    <div>
+                        <strong>{{ result.title }}</strong>
+                        {% if result.authors is not empty %}
+                            <span>{{ result.authors|join(', ') }}</span>
+                        {% endif %}
+                    </div>
+
+                    <form
+                        method="post"
+                        action="{{ path('app_club_set_book', {id: club.id}) }}"
+                        data-turbo-frame="_top"
+                        data-controller="confirm-book-change"
+                        data-confirm-book-change-active-value="{{ club.currentBook ? 'true' : 'false' }}"
+                        data-action="submit->confirm-book-change#confirm"
+                    >
+                        <input type="hidden" name="externalId" value="{{ result.externalId }}">
+                        <label>
+                            Nombre de chapitres
+                            <input type="number" name="chapterCount" min="1" required>
+                        </label>
+                        <input type="hidden" name="_token" value="{{ csrf_token('club_set_book') }}">
+                        <button type="submit">Définir comme livre en cours</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</turbo-frame>

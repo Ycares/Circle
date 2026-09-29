@@ -7,12 +7,10 @@ namespace App\UI\Controller;
 use App\Application\Port\BookMetadataProviderInterface;
 use App\Application\UseCase\AddBookToLibrary\AddBookToLibraryUseCase;
 use App\Application\UseCase\UpdateReadingProgress\UpdateReadingProgressUseCase;
-use App\Domain\Entity\User;
 use App\Domain\Exception\BookAlreadyInLibraryException;
 use App\Domain\Exception\EntityNotFoundException;
 use App\Domain\Exception\UnauthorizedActionException;
 use App\Domain\Repository\UserBookRepositoryInterface;
-use App\Infrastructure\Security\SecurityUser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +20,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class LibraryController extends AbstractController
 {
+    use CurrentUserTrait;
+    use ParsesPatchPayloadTrait;
+
     public function __construct(
         private readonly UserBookRepositoryInterface $userBookRepository,
         private readonly BookMetadataProviderInterface $bookMetadataProvider,
@@ -112,42 +113,5 @@ final class LibraryController extends AbstractController
         }
 
         return $this->redirectToRoute('app_library_index');
-    }
-
-    private function currentUser(): User
-    {
-        $securityUser = $this->getUser();
-        \assert($securityUser instanceof SecurityUser);
-
-        return $securityUser->user();
-    }
-
-    /**
-     * PHP ne peuple jamais $_POST pour une requête PATCH : le corps doit être lu et
-     * décodé manuellement (form-urlencoded ou JSON selon le Content-Type).
-     *
-     * @return array<string, mixed>
-     */
-    private function parsePatchPayload(Request $request): array
-    {
-        if ($request->request->count() > 0) {
-            return $request->request->all();
-        }
-
-        $content = $request->getContent();
-
-        if ('' === $content) {
-            return [];
-        }
-
-        if (str_contains((string) $request->headers->get('Content-Type'), 'application/json')) {
-            $decoded = json_decode($content, true);
-
-            return \is_array($decoded) ? $decoded : [];
-        }
-
-        parse_str($content, $data);
-
-        return $data;
     }
 }

@@ -1,0 +1,18 @@
+{# Liste des channels du club : le channel global (jamais verrouillé) puis un par chapitre #}
+<nav class="club-channels">
+    <a href="{{ path('app_club_discussions', {id: club.id}) }}" data-turbo-frame="discussions">
+        # Général
+    </a>
+
+    {% for chapter in chapters %}
+        {% set locked = membership is not null and chapter.chapterNumber > membership.declaredChapter %}
+        <a
+            href="{{ path('app_club_discussions', {id: club.id, chapter: chapter.id}) }}"
+            data-turbo-frame="discussions"
+            data-controller="chapter-lock"
+            data-chapter-lock-locked-value="{{ locked ? 'true' : 'false' }}"
+        >
+            Chapitre {{ chapter.chapterNumber }}
+        </a>
+    {% endfor %}
+</nav>
