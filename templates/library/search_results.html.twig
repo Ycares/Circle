@@ -1,0 +1,30 @@
+<turbo-frame id="search-results">
+    {% if query is not empty and results is empty %}
+        <p>Aucun résultat pour « {{ query }} ».</p>
+    {% endif %}
+
+    {% if results is not empty %}
+        <ul class="search-results">
+            {% for result in results %}
+                <li class="search-result">
+                    {% if result.coverUrl %}
+                        <img src="{{ result.coverUrl }}" alt="">
+                    {% endif %}
+
+                    <div>
+                        <strong>{{ result.title }}</strong>
+                        {% if result.authors is not empty %}
+                            <span>{{ result.authors|join(', ') }}</span>
+                        {% endif %}
+                    </div>
+
+                    <form method="post" action="{{ path('app_library_add_book') }}" data-turbo-frame="_top">
+                        <input type="hidden" name="externalId" value="{{ result.externalId }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('library_add_book') }}">
+                        <button type="submit">Ajouter à ma bibliothèque</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</turbo-frame>
