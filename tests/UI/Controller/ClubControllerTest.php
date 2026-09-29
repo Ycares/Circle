@@ -10,11 +10,13 @@ use App\Application\Port\PasswordHasherInterface;
 use App\Domain\Entity\Book;
 use App\Domain\Entity\Chapter;
 use App\Domain\Entity\ClubMembership;
+use App\Domain\Entity\Discussion;
 use App\Domain\Entity\ReadingClub;
 use App\Domain\Entity\User;
 use App\Domain\Repository\BookRepositoryInterface;
 use App\Domain\Repository\ChapterRepositoryInterface;
 use App\Domain\Repository\ClubMembershipRepositoryInterface;
+use App\Domain\Repository\DiscussionRepositoryInterface;
 use App\Domain\Repository\ReadingClubRepositoryInterface;
 use App\Domain\Repository\UserRepositoryInterface;
 use App\Domain\ValueObject\ClubRole;
@@ -176,6 +178,92 @@ final class ClubControllerTest extends WebTestCase
 
         self::assertNotNull($untouchedClub);
         self::assertNull($untouchedClub->currentBook());
+    }
+
+    public function testChangingBookRemovesOldChaptersAndTheirDiscussions(): void
+    {
+        $client = static::createClient();
+        $client->disableReboot();
+        static::getContainer()->set(GoogleBooksProvider::class, $this->fakeProvider());
+
+        $host = $this->createUser('host-'.uniqid().'@example.com');
+        $club = $this->createClub($host, ClubVisibility::PUBLIC, chapterCount: 2);
+
+        $chapterRepository = static::getContainer()->get(ChapterRepositoryInterface::class);
+        $discussionRepository = static::getContainer()->get(DiscussionRepositoryInterface::class);
+
+        $oldChapters = $chapterRepository->ofReadingClub($club);
+        $oldChapterOne = current(array_filter($oldChapters, static fn (Chapter $c): bool => 1 === $c->chapterNumber()));
+        self::assertNotFalse($oldChapterOne);
+
+        $discussionRepository->save(new Discussion($club, $oldChapterOne, $host, 'Spoiler du chapitre 1 du livre A', new \DateTimeImmutable()));
+        $globalDiscussion = new Discussion($club, null, $host, 'Message du channel général', new \DateTimeImmutable());
+        $discussionRepository->save($globalDiscussion);
+
+        $this->loginAs($client, $host);
+        [, $setBookToken] = $this->harvestBookTokens($client, $club->id());
+
+        $client->request('POST', \sprintf('/clubs/%d/book', $club->id()), [
+            'externalId' => 'abc123',
+            'chapterCount' => '4',
+            '_token' => $setBookToken,
+        ]);
+
+        self::assertResponseRedirects(\sprintf('/clubs/%d', $club->id()));
+
+        $readingClubRepository = static::getContainer()->get(ReadingClubRepositoryInterface::class);
+        $updatedClub = $readingClubRepository->ofId($club->id());
+        self::assertNotNull($updatedClub);
+        self::assertSame(4, $updatedClub->chapterCount());
+
+        $newChapters = $chapterRepository->ofReadingClub($updatedClub);
+        self::assertCount(4, $newChapters);
+
+        $oldChapterIds = array_map(static fn (Chapter $c): ?int => $c->id(), $oldChapters);
+        $newChapterIds = array_map(static fn (Chapter $c): ?int => $c->id(), $newChapters);
+        self::assertEmpty(array_intersect($oldChapterIds, $newChapterIds));
+
+        $remainingDiscussions = $discussionRepository->ofReadingClub($updatedClub);
+        $remainingTexts = array_map(static fn (Discussion $d): string => $d->text(), $remainingDiscussions);
+
+        self::assertNotContains('Spoiler du chapitre 1 du livre A', $remainingTexts);
+        self::assertContains('Message du channel général', $remainingTexts);
+    }
+
+    public function testCorrectingChapterCountViaController(): void
+    {
+        $client = static::createClient();
+        $host = $this->createUser('host-'.uniqid().'@example.com');
+        $club = $this->createClub($host, ClubVisibility::PUBLIC, chapterCount: 10);
+
+        $member = $this->createUser('member-'.uniqid().'@example.com');
+        $membership = $this->joinClub($member, $club, ClubRole::MEMBER);
+        $membership->declareChapter(10);
+        static::getContainer()->get(ClubMembershipRepositoryInterface::class)->save($membership);
+
+        $this->loginAs($client, $host);
+        $crawler = $client->request('GET', \sprintf('/clubs/%d', $club->id()));
+        $token = $this->extractToken($crawler, 'form[action$="/chapter-count"] input[name="_token"]');
+
+        $client->request('PATCH', \sprintf('/clubs/%d/chapter-count', $club->id()), [
+            'chapterCount' => '8',
+            '_token' => $token,
+        ]);
+
+        self::assertResponseRedirects(\sprintf('/clubs/%d', $club->id()));
+
+        $readingClubRepository = static::getContainer()->get(ReadingClubRepositoryInterface::class);
+        $updatedClub = $readingClubRepository->ofId($club->id());
+        self::assertNotNull($updatedClub);
+        self::assertSame(8, $updatedClub->chapterCount());
+
+        $chapterRepository = static::getContainer()->get(ChapterRepositoryInterface::class);
+        self::assertCount(8, $chapterRepository->ofReadingClub($updatedClub));
+
+        $membershipRepository = static::getContainer()->get(ClubMembershipRepositoryInterface::class);
+        $updatedMembership = $membershipRepository->ofUserAndClub($member, $updatedClub);
+        self::assertNotNull($updatedMembership);
+        self::assertSame(8, $updatedMembership->declaredChapter());
     }
 
     public function testDeclaringProgressUpdatesMembership(): void
