@@ -1,0 +1,27 @@
+{% if club.currentBook %}
+    <p class="warning">
+        Attention : définir un nouveau livre supprimera définitivement les chapitres et discussions
+        actuels de « {{ club.currentBook.title }} ».
+    </p>
+
+    <form method="patch" action="{{ path('app_club_update_chapter_count', {id: club.id}) }}">
+        <label for="chapter-count">Corriger le nombre de chapitres ({{ club.chapterCount }} actuellement)</label>
+        <input type="number" id="chapter-count" name="chapterCount" min="1" value="{{ club.chapterCount }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('club_update_chapter_count') }}">
+        <button type="submit">Corriger</button>
+    </form>
+{% endif %}
+
+<div data-controller="book-search">
+    <form
+        method="post"
+        action="{{ path('app_club_book_search', {id: club.id}) }}"
+        data-turbo-frame="club-book-search-results"
+        data-book-search-target="form"
+    >
+        <input type="text" name="q" placeholder="Rechercher un livre..." autocomplete="off" data-action="input->book-search#search">
+        <input type="hidden" name="_token" value="{{ csrf_token('club_book_search') }}">
+    </form>
+
+    <turbo-frame id="club-book-search-results"></turbo-frame>
+</div>

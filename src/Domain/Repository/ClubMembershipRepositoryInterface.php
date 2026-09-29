@@ -18,4 +18,9 @@ interface ClubMembershipRepositoryInterface
      * @return list<ClubMembership>
      */
     public function ofReadingClub(ReadingClub $readingClub): array;
+
+    /**
+     * @return list<ClubMembership>
+     */
+    public function ofUser(User $user): array;
 }

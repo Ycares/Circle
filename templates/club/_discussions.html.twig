@@ -1,0 +1,24 @@
+<turbo-frame id="discussions">
+    {% if error %}
+        <p class="flash-error">{{ error }}</p>
+    {% else %}
+        <ul class="discussion-list">
+            {% for discussion in discussions %}
+                <li>
+                    <strong>{{ discussion.author.pseudo }}</strong>
+                    <time>{{ discussion.createdAt|date('d/m/Y H:i') }}</time>
+                    <p>{{ discussion.text }}</p>
+                </li>
+            {% else %}
+                <li>Aucun message pour le moment.</li>
+            {% endfor %}
+        </ul>
+
+        <form method="post" action="{{ path('app_club_post_discussion', {id: clubId}) }}" data-turbo-frame="discussions">
+            <input type="hidden" name="chapterId" value="{{ chapterId }}">
+            <textarea name="text" required></textarea>
+            <input type="hidden" name="_token" value="{{ csrf_token('club_post_discussion') }}">
+            <button type="submit">Envoyer</button>
+        </form>
+    {% endif %}
+</turbo-frame>

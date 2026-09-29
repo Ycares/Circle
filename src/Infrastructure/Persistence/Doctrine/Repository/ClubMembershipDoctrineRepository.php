@@ -34,4 +34,9 @@ final class ClubMembershipDoctrineRepository implements ClubMembershipRepository
     {
         return $this->entityManager->getRepository(ClubMembership::class)->findBy(['readingClub' => $readingClub]);
     }
+
+    public function ofUser(User $user): array
+    {
+        return $this->entityManager->getRepository(ClubMembership::class)->findBy(['user' => $user]);
+    }
 }

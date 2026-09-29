@@ -1,0 +1,24 @@
+{# Formulaire de création d'un club, inclus dans club/index.html.twig #}
+<form method="post" action="{{ path('app_club_create') }}">
+    <div>
+        <label for="club-name">Nom du club</label>
+        <input type="text" id="club-name" name="name" required>
+    </div>
+
+    <div>
+        <label for="club-description">Description</label>
+        <textarea id="club-description" name="description"></textarea>
+    </div>
+
+    <div>
+        <label for="club-visibility">Visibilité</label>
+        <select id="club-visibility" name="visibility">
+            <option value="public">Publique</option>
+            <option value="private_invite">Privée (sur invitation)</option>
+            <option value="private_request">Privée (sur demande)</option>
+        </select>
+    </div>
+
+    <input type="hidden" name="_token" value="{{ csrf_token('club_create') }}">
+    <button type="submit">Créer le club</button>
+</form>

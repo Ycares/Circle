@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clubs de lecture{% endblock %}
+
+{% block body %}
+    <h1>Clubs de lecture</h1>
+
+    {% for message in app.flashes('success') %}
+        <p class="flash-success">{{ message }}</p>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <p class="flash-error">{{ message }}</p>
+    {% endfor %}
+
+    <section>
+        <h2>Créer un club</h2>
+        {% include 'club/create.html.twig' %}
+    </section>
+
+    <section>
+        <h2>Mes clubs</h2>
+
+        {% if myClubs is empty %}
+            <p>Vous n'avez rejoint aucun club pour le moment.</p>
+        {% else %}
+            <ul class="club-list">
+                {% for club in myClubs %}
+                    <li>
+                        <a href="{{ path('app_club_show', {id: club.id}) }}">{{ club.name }}</a>
+                        <span>{{ club.description }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Clubs publics</h2>
+
+        {% if publicClubs is empty %}
+            <p>Aucun club public disponible pour le moment.</p>
+        {% else %}
+            <ul class="club-list">
+                {% for club in publicClubs %}
+                    <li>
+                        <a href="{{ path('app_club_show', {id: club.id}) }}">{{ club.name }}</a>
+                        <span>{{ club.description }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+{% endblock %}
